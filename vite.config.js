@@ -1,10 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath, URL } from "node:url";
-
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
-  root: "client",
+  root: mode === "production" ? "." : "client",
+  publicDir: mode === "production" ? "client/public" : "public",
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./client/src", import.meta.url)),
@@ -12,8 +12,11 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: "../dist/public",
+    outDir: mode === "production" ? "dist" : "../dist/public",
     emptyOutDir: true,
+    rollupOptions: mode === "production" ? {
+      input: "client/index.html"
+    } : undefined,
   },
   server: {
     proxy: {
@@ -23,4 +26,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));
